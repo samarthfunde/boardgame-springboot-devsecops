@@ -152,7 +152,6 @@ sudo mkdir -p -m 755 /etc/apt/keyrings
 ###  Add Kubernetes Repository & GPG Key
 ```
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 ```
 
@@ -187,7 +186,6 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ###  Deploy Calico Network Plugin
 ```
 kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-
 Calico provides pod-to-pod networking inside the cluster.
 ```
 ---
@@ -197,7 +195,6 @@ Calico provides pod-to-pod networking inside the cluster.
 ###  Deploy NGINX Ingress Controller
 ```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.49.0/deploy/static/provider/baremetal/deploy.yaml
-
 Ingress Controller manages external HTTP/HTTPS access to services inside the cluster.
 ```
 ---
