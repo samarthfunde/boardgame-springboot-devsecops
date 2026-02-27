@@ -231,9 +231,92 @@ kubeaudit all
 
 ```
 this command scan the entire cluster and show the any vulnerabilities
-
-
 This improves cluster security posture and helps maintain compliance.
+
+
+After Kubernetes cluster setup, I configured Code Quality and Artifact Management tools.
+
+---
+
+## 7 SonarQube Setup (On SonarQube Server)
+
+###  Step 1 – Install Docker
+
+Installed Docker using official Docker repository.
+
+Purpose:
+- To run SonarQube as a containerized service
+- Ensures portability and simplified management
+
+---
+
+### Step 2 – Run SonarQube Container
+
+```
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
+```
+
+Port Used:
+- 9000 → SonarQube Web UI
+
+Access URL:
+```
+http://<SonarQube-Server-IP>:9000
+```
+
+Default Credentials:
+- Username: admin
+- Password: admin
+
+Purpose of SonarQube:
+- Static Code Analysis
+- Code Quality Check
+- Detect Bugs, Vulnerabilities, Code Smells
+- Enforce Quality Gates in CI/CD Pipeline
+
+---
+
+## 8 Nexus Setup (On Nexus Server)
+
+###  Step 1 – Install Docker
+
+Installed Docker using same process as SonarQube server.
+
+---
+
+###  Step 2 – Run Nexus Container
+
+```
+docker run -d --name Nexus -p 8081:8081 sonatype/nexus3
+```
+
+Port Used:
+- 8081 → Nexus Web UI
+
+Access URL:
+```
+http://<Nexus-Server-IP>:8081
+```
+
+---
+
+###  Step 3 – Retrieve Nexus Admin Password
+
+To get initial admin password:
+
+```
+docker exec -it <container_id> /bin/bash
+cd sonatype-work/nexus3
+cat admin.password
+```
+
+Purpose of Nexus:
+- Artifact Repository Manager
+- Stores:
+  - Maven JAR files
+  - Build artifacts
+  - Docker images
+  - Acts as centralized artifact storage in CI/CD pipeline
 
 ---
 
