@@ -274,6 +274,8 @@ Purpose of SonarQube:
 - Detect Bugs, Vulnerabilities, Code Smells
 - Enforce Quality Gates in CI/CD Pipeline
 
+<img width="1919" height="958" alt="image" src="https://github.com/user-attachments/assets/430c28d7-1ce5-4846-97bc-44d59a112ad1" />
+
 ---
 
 ## 8 Nexus Setup (On Nexus Server)
@@ -317,6 +319,73 @@ Purpose of Nexus:
   - Build artifacts
   - Docker images
   - Acts as centralized artifact storage in CI/CD pipeline
+
+<img width="1917" height="624" alt="image" src="https://github.com/user-attachments/assets/7838f3ec-25d8-4d49-a83d-c6fae330fac8" />
+
+## 9 Nexus Configuration – Storing Build Artifacts
+
+After installing Nexus, I configured my Maven project to store build artifacts (.jar files) in Nexus repository.
+
+###  Step 1 – Configure pom.xml
+
+Added the following configuration inside / following `pom.xml`:
+
+```
+<distributionManagement>
+    <repository>
+        <id>nexus-releases</id>
+        <url>http://<NEXUS-IP>:8081/repository/maven-releases/</url>
+    </repository>
+    <snapshotRepository>
+        <id>nexus-snapshots</id>
+        <url>http://<NEXUS-IP>:8081/repository/maven-snapshots/</url>
+    </snapshotRepository>
+</distributionManagement>
+```
+
+---
+
+###  Step 2 – Build & Deploy Artifact
+
+Used the following Maven command in Jenkins pipeline:
+```
+mvn clean deploy
+```
+Purpose:
+- `package` → Creates .jar file
+- `deploy` → Uploads .jar file to Nexus repository
+
+---
+
+###  Maven Releases vs Snapshots
+
+ Maven Releases:
+- Used for stable, production-ready versions
+- Version format: 1.0.0
+- Immutable (cannot be overwritten)
+
+Maven Snapshots:
+- Used for development/testing versions
+- Version format: 1.0.0-SNAPSHOT
+- Can be updated multiple times
+
+---
+
+### Why We Use Both?
+
+- Snapshots → For continuous development builds
+- Releases → For stable production deployments
+- Enables version control and artifact promotion strategy
+- Ensures the same tested artifact moves from Dev → QA → Prod
+
+---
+
+### Where Artifacts Are Stored in Nexus
+
+Nexus UI → Browse → maven-releases or maven-snapshots  
+Path structure:
+
+groupId / artifactId / version / .jar file
 
 ---
 
