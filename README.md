@@ -856,6 +856,15 @@ nano 3_bind_role_to_service_acc.yaml
 Purpose:
 Binds Role to Service Account so Jenkins gets required permissions.
 
+<img width="1712" height="606" alt="image" src="https://github.com/user-attachments/assets/9ba9f6f4-3443-46b8-8b81-4fe491268a8d" />
+
+<img width="1919" height="748" alt="image" src="https://github.com/user-attachments/assets/6793c304-2f24-4e34-acad-f89ede817eab" />
+
+<img width="1917" height="927" alt="image" src="https://github.com/user-attachments/assets/6d6303e9-2eee-447e-8ec3-28a9645aa6c0" />
+
+<img width="1919" height="729" alt="image" src="https://github.com/user-attachments/assets/b376a2e6-ed5f-4c6d-8775-ea123d68a8d2" />
+
+
 ---
 
 # 1️8 kubeconfig File Usage
@@ -1006,6 +1015,237 @@ Email notification helps to:
 • Improve monitoring and communication  
 
 <img width="1914" height="901" alt="image" src="https://github.com/user-attachments/assets/4591ed21-d193-490b-83fc-812ed4d2ad21" />
+
+---
+
+#  PHASE 3 – Monitoring & Observability Setup
+
+
+In this phase, I implemented centralized monitoring for the complete DevSecOps pipeline.
+
+Tools Used:
+
+• Prometheus – Metrics Collection  
+• Grafana – Visualization  
+• Blackbox Exporter – Website Uptime Monitoring  
+
+Monitoring server configured separately with different ports.
+
+---
+
+#  Why Monitoring is Required?
+
+Monitoring helps to:
+
+• Track application uptime  
+• Monitor Kubernetes cluster health  
+• Monitor Jenkins performance  
+• Monitor server CPU & memory  
+• Get real-time alerts  
+• Visualize metrics using dashboards  
+
+Monitoring snapshots were captured for documentation.
+
+---
+
+# 20 Prometheus Setup
+
+File:
+```
+nano prometheus_setup.sh
+```
+
+```bash
+sudo apt update -y
+
+# Download Prometheus from official documentation
+wget https://github.com/prometheus/prometheus/releases/download/v3.10.0/prometheus-3.10.0.linux-amd64.tar.gz
+
+# Extract the file
+tar -xvf prometheus-3.10.0.linux-amd64.tar.gz
+
+# Navigate into directory
+cd prometheus-3.10.0.linux-amd64
+
+# Run Prometheus in background
+./prometheus &
+```
+
+Default Port:
+```
+9090
+```
+
+Access Prometheus:
+```
+http://<Monitoring-Server-IP>:9090
+```
+
+Purpose:
+Prometheus collects metrics from:
+
+• Kubernetes cluster  
+• Jenkins server  
+• Node Exporter  
+• Blackbox Exporter  
+
+---
+
+# 21 Blackbox Exporter Setup
+
+File:
+```
+nano blackbox_exporter.sh
+```
+
+```bash
+# Download Blackbox Exporter
+wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.28.0/blackbox_exporter-0.28.0.linux-amd64.tar.gz
+
+# Extract
+tar -xvf blackbox_exporter-0.28.0.linux-amd64.tar.gz
+
+# Remove tar file
+rm -rf blackbox_exporter-0.28.0.linux-amd64.tar.gz
+
+# Navigate to folder
+cd blackbox_exporter-0.28.0.linux-amd64
+
+# Run in background
+./blackbox_exporter &
+```
+
+Default Port:
+```
+9115
+```
+
+Access:
+```
+http://<Monitoring-Server-IP>:9115
+```
+
+Purpose:
+
+Blackbox Exporter monitors:
+
+• Website URL availability  
+• HTTP response status  
+• Response time  
+• SSL certificate validity  
+
+It ensures the deployed application is publicly accessible.
+
+---
+
+# 22 Grafana Setup
+
+File:
+```
+nano grafana_setup.sh
+```
+
+```bash
+# Install dependencies
+sudo apt-get install -y adduser libfontconfig1 musl
+
+# Download Grafana Enterprise
+wget https://dl.grafana.com/grafana-enterprise/release/12.4.0/grafana-enterprise_12.4.0_22325204712_linux_amd64.deb
+
+# Install Grafana
+sudo dpkg -i grafana-enterprise_12.4.0_22325204712_linux_amd64.deb
+
+# Start Grafana service
+sudo systemctl start grafana-server
+
+# Enable Grafana at boot
+sudo systemctl enable grafana-server
+```
+
+Default Port:
+```
+3000
+```
+
+Access Grafana:
+```
+http://<Monitoring-Server-IP>:3000
+```
+
+Default Login:
+```
+Username: admin
+Password: admin
+```
+
+After login:
+
+1. Add Data Source → Prometheus  
+   URL:
+   ```
+   http://localhost:9090
+   ```
+
+2. Create Dashboards  
+3. Import Kubernetes / Node Exporter dashboards  
+
+---
+
+#  Ports Used on Monitoring Server
+
+| Tool              | Port              |
+|------------------ |------------------ |
+| Prometheus        | 9090              |
+| Grafana           | 3000              |
+| Blackbox Exporter | 9115              |
+
+All tools configured on a single monitoring server.
+
+---
+
+#  Monitoring Flow Architecture
+
+Application  
+↓  
+Kubernetes  
+↓  
+Prometheus (collect metrics)  
+↓  
+Grafana (visualization dashboard)
+
+External Website URL  
+↓  
+Blackbox Exporter  
+↓  
+Prometheus  
+↓  
+Grafana Dashboard  
+
+<img width="1918" height="916" alt="Screenshot 2026-02-27 110705" src="https://github.com/user-attachments/assets/67fb6bbb-11b7-46a7-ba80-2fe10e39a799" />
+
+<img width="1919" height="972" alt="Screenshot 2026-02-27 114140" src="https://github.com/user-attachments/assets/0e4ea363-5e63-41e4-bfe9-64db50b4b5f4" />
+
+<img width="722" height="542" alt="Screenshot 2026-02-27 115155" src="https://github.com/user-attachments/assets/05e9cc37-5c82-417c-aa31-171352748c30" />
+
+<img width="1919" height="951" alt="Screenshot 2026-02-27 124639" src="https://github.com/user-attachments/assets/5dbc9cb2-8b9b-46a8-89a2-846e4a759bba" />
+
+<img width="701" height="931" alt="Screenshot 2026-02-27 130804" src="https://github.com/user-attachments/assets/203f1b74-61f0-4fee-8abc-af8a0bb981cc" />
+
+<img width="1919" height="950" alt="Screenshot 2026-02-27 125210" src="https://github.com/user-attachments/assets/6fd78a6a-08f8-4091-b0e9-45983ffc0c2c" />
+
+<img width="1919" height="908" alt="Screenshot 2026-02-27 125219" src="https://github.com/user-attachments/assets/3320d611-7f17-4684-8ea3-6ad418f7a645" />
+
+<img width="1919" height="925" alt="Screenshot 2026-02-27 125720" src="https://github.com/user-attachments/assets/5cad40e8-1083-4581-9721-e8b8576ccf85" />
+
+<img width="1917" height="946" alt="Screenshot 2026-02-27 134256" src="https://github.com/user-attachments/assets/ae779f7b-f3d3-4750-8c58-a3c8373eb654" />
+
+<img width="1919" height="962" alt="Screenshot 2026-02-27 142155" src="https://github.com/user-attachments/assets/04ab92c8-07d1-45e2-8d89-83ce04c5290a" />
+
+<img width="1919" height="958" alt="Screenshot 2026-02-27 142300" src="https://github.com/user-attachments/assets/08ea6ca4-0df2-4e77-8de2-183f23c4d55c" />
+
+<img width="1919" height="951" alt="Screenshot 2026-02-27 145429" src="https://github.com/user-attachments/assets/08699ecb-8662-4107-883a-ddd448f09749" />
+
+
 
 
 ---
