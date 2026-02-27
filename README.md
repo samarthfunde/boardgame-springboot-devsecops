@@ -133,57 +133,73 @@ MobaXterm is optional. We can also use:
 Executed the following steps on both Master and Slave-1:
 
 ###  Update Packages
+```
 sudo apt-get update
+```
 
 ###  Install Docker
+```
 sudo apt install docker.io -y
 sudo chmod 666 /var/run/docker.sock
+```
 
 ###  Install Required Dependencies
+```
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
 sudo mkdir -p -m 755 /etc/apt/keyrings
+```
 
 ###  Add Kubernetes Repository & GPG Key
+```
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+```
 
 ###  Update Repository
+```
 sudo apt update
+```
 
 ###  Install Kubernetes Components
+```
 sudo apt install -y kubeadm=1.28.1-1.1 kubelet=1.28.1-1.1 kubectl=1.28.1-1.1
-
+```
 ---
 
 ## 2️ Initialize Kubernetes Cluster (Master Node Only)
 
 ###  Initialize Control Plane
+```
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+```
 
 ###  Configure kubectl Access
+```
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
+```
 ---
 
 ## 3️ Install Networking (Master Node)
 
 ###  Deploy Calico Network Plugin
+```
 kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 
 Calico provides pod-to-pod networking inside the cluster.
-
+```
 ---
 
 ## 4️ Install Ingress Controller
 
 ###  Deploy NGINX Ingress Controller
+```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.49.0/deploy/static/provider/baremetal/deploy.yaml
 
 Ingress Controller manages external HTTP/HTTPS access to services inside the cluster.
-
+```
 ---
 
 ## 5️ Join Worker Node (Slave-1)
@@ -197,9 +213,10 @@ This allowed Slave-1 to run application pods.
 ## 6️ Kubernetes Security Scanning (kubeaudit)
 
 Installed kubeaudit on Master Node:
-
+```
 wget https://github.com/Shopify/kubeaudit/releases/download/v0.22.2/kubeaudit_0.22.2_linux_amd64.tar.gz
 tar -xvzf kubeaudit_0.22.2_linux_amd64.tar.gz
+```
 
 ###  Why kubeaudit?
 
