@@ -389,5 +389,144 @@ groupId / artifactId / version / .jar file
 
 ---
 
+# 1️0 Jenkins Setup (On Jenkins Server)
+
+---
+
+##  Step 1 – Install Docker (docker.sh)
+
+```bash
+# Update system
+sudo apt update
+
+# Install required packages
+sudo apt install ca-certificates curl -y
+sudo install -m 0755 -d /etc/apt/keyrings
+
+# Add Docker GPG key
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add Docker repository
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+# Update and install Docker
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+# Start Docker
+sudo systemctl start docker
+
+# Allow ubuntu user to run Docker without sudo
+sudo chmod 666 /var/run/docker.sock
+
+# Test Docker
+docker run hello-world
+```
+
+Purpose:
+Docker is required for building and running container images inside Jenkins pipeline.
+
+---
+
+##  Step 2 – Install Java & Jenkins (jenkins.sh)
+
+```bash
+#!/bin/bash
+
+# Install Java (Jenkins prerequisite)
+sudo apt install openjdk-17-jre-headless -y
+
+# Add Jenkins GPG key
+sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+
+# Add Jenkins repository
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+/etc/apt/sources.list.d/jenkins.list > /dev/null
+
+# Update packages
+sudo apt update
+
+# Install Jenkins
+sudo apt install jenkins -y
+
+# Start Jenkins
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+
+# Check Jenkins status
+sudo systemctl status jenkins
+```
+
+Default Port:
+```
+8080
+```
+
+Access:
+```
+http://<Jenkins-Server-IP>:8080
+```
+
+To get initial admin password:
+```bash
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+```
+
+---
+
+## 🔹 Step 3 – Install kubectl (kubectl.sh)
+
+```bash
+# Download kubectl
+curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
+
+# Make executable
+chmod +x ./kubectl
+
+# Move to system path
+sudo mv ./kubectl /usr/local/bin
+
+# Verify installation
+kubectl version --short --client
+```
+
+Purpose:
+Allows Jenkins to deploy applications to Kubernetes cluster.
+
+---
+
+## 🔹 Step 4 – Install Trivy (trivy.sh)
+
+```bash
+# Install dependencies
+sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+
+# Add Trivy GPG key
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+
+# Add Trivy repository
+echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+
+# Update and install Trivy
+sudo apt update -y
+sudo apt install trivy -y
+
+# Verify installation
+trivy --version
+```
+
+Purpose:
+Trivy scans Docker images for vulnerabilities before deployment.
+
+---
 
 
