@@ -51,3 +51,56 @@ This web application displays lists of board games and their reviews. While anyo
   - username: bugs    |     password: bunny (user role)
   - username: daffy   |     password: duck  (manager role)
 5. You can also sign-up as a new user and customize your role to play with the application! 😊
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#  Phase 1 – Infrastructure Setup (AWS)
+
+## 1️ EC2 Instances Launched
+
+I launched 6 EC2 instances in AWS to build a complete DevOps pipeline environment:
+
+| Server Name | Purpose                                                    |
+|-------------|----------------------------------------------------------- |
+| Master      | Kubernetes Control Plane (Cluster management & API server) |
+| Slave-1     | Kubernetes Worker Node (Runs application pods)             |
+| Jenkins     | CI/CD automation server (Build & Deploy pipeline)          |
+| SonarQube   | Static code analysis & Quality Gate checks                 |
+| Nexus       | Artifact repository (Stores JAR/Docker images)             |
+| Monitor     | Monitoring server (Prometheus, Grafana, Blackbox Exporter) |
+
+---
+
+## 2️ Security Group Configuration
+
+Created a primary Security Group and attached it to all instances.
+
+###  Inbound Rules Configured
+
+| Port | Purpose                                                                                |
+|------       |---------------------------------------------------------------------------------|                                                                    
+| 22          | SSH access                                                                      |
+| 80          | HTTP access                                                                     |
+| 443         | HTTPS access                                                                    |
+| 6443        | Kubernetes API Server                                                           |
+| 10250       | Kubelet API                                                                     |
+| 30000-32767 | Kubernetes NodePort services                                                    |
+| 3000-10000  | Application & Monitoring tools (Grafana, SonarQube, Nexus, Jenkins etc.)        |
+| 25          | SMTP                                                                            |
+| 465         | SMTPS                                                                           |
+| 179         | BGP (Internal cluster communication if required)                                |
+
+
+
+---
