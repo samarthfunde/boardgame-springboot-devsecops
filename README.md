@@ -483,7 +483,7 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 
 ---
 
-## 🔹 Step 3 – Install kubectl (kubectl.sh)
+##  Step 3 – Install kubectl (kubectl.sh)
 
 ```bash
 # Download kubectl
@@ -504,7 +504,7 @@ Allows Jenkins to deploy applications to Kubernetes cluster.
 
 ---
 
-## 🔹 Step 4 – Install Trivy (trivy.sh)
+##  Step 4 – Install Trivy (trivy.sh)
 
 ```bash
 # Install dependencies
@@ -529,4 +529,483 @@ Trivy scans Docker images for vulnerabilities before deployment.
 
 ---
 
+# 1️1 GitHub Repository Setup
 
+##  Step 1 – Create Repository on GitHub
+
+Created a new repository in GitHub to store application source code.
+
+---
+
+##  Step 2 – Push Project Code to GitHub
+
+Used following commands to push project:
+
+```bash
+git init
+git add .
+git commit -m "push project"
+git remote add origin <repository-url>
+git push -u origin master
+```
+
+Purpose:
+Version control and integration with Jenkins CI/CD pipeline.
+
+---
+
+# 1️2 Jenkins Plugin Installation
+
+Installed required plugins from:
+
+Manage Jenkins → Manage Plugins
+
+## Installed Plugins:
+
+###  JDK
+- Eclipse Temurin Installer
+
+###  Maven
+- Maven Integration
+- Pipeline Maven Integration
+- Config File Provider
+
+###  SonarQube
+- SonarQube Scanner
+
+###  Docker
+- Docker
+- Docker Pipeline
+
+###  Kubernetes
+- Kubernetes
+- Kubernetes CLI
+- Kubernetes Client API
+- Kubernetes Credentials
+
+###  Monitoring
+- Prometheus Metrics Plugin
+
+Purpose:
+These plugins integrate Jenkins with build tools, security scanners, container runtime, Kubernetes, and monitoring systems.
+
+---
+
+# 1️3 Jenkins Tool Configuration
+
+Configured tools under:
+
+Manage Jenkins → Global Tool Configuration
+
+---
+
+##  JDK Installation
+
+Name:
+```
+jdk17
+```
+
+Install Automatically:
+Enabled
+Source:
+Adoptium (Temurin) – Version 17
+
+---
+
+##  Maven Installation
+
+Name:
+```
+maven3
+```
+
+Version:
+```
+3.6.1
+```
+
+Install Automatically:
+Enabled
+
+---
+
+##  SonarQube Scanner
+
+Name:
+```
+sonar-scanner
+```
+
+Version:
+Latest
+
+Install Automatically:
+Enabled
+
+---
+
+##  Docker Installation
+
+Name:
+```
+docker
+```
+
+Version:
+Latest
+
+Install Automatically:
+Enabled
+
+---
+
+After configuring all tools → Click Save.
+
+---
+
+# 1️4 Jenkins Pipeline Creation
+
+Created a new Pipeline Job.
+
+Item Name:
+```
+BoardGame
+```
+
+Pipeline Configuration:
+
+- Selected: Pipeline script from SCM
+- SCM: Git
+- Repository URL: <your-github-repo-url>
+- Branch: master
+- Script Path:
+
+```
+Jenkins_Pipeline_File
+```
+
+Purpose:
+This file contains the complete CI/CD pipeline stages including:
+
+• Git Checkout  
+• Maven Build  
+• SonarQube Analysis  
+• Artifact Upload to Nexus  
+• Docker Build  
+• Trivy Scan  
+• Push Image  
+• Kubernetes Deployment 
+
+
+---
+
+# 1️5 Jenkins Credentials Configuration
+
+Configured credentials from:
+
+Manage Jenkins → Credentials → System → Global Credentials → Add Credentials
+
+---
+
+##  1. GitHub Credentials
+
+Kind: Username with Password  
+ID:
+```
+git-cred
+```
+Username & Password:
+```
+Purpose:
+Used by Jenkins pipeline to clone private GitHub repository.
+
+---
+
+##  2. SonarQube Token
+
+Kind: Secret Text  
+ID:
+```
+sonar-token
+```
+
+Purpose:
+Used in pipeline for SonarQube authentication during code quality analysis.
+
+---
+
+##  3. DockerHub Credentials
+
+Kind: Username with Password  
+ID:
+```
+docker-cred
+```
+Username:
+```
+samarthfunde
+```
+Purpose:
+Used to login and push Docker images to DockerHub from Jenkins pipeline.
+
+---
+
+##  4. Email Credentials
+
+Kind: Username with Password  
+ID:
+```
+mail-cred
+```
+Username:
+```
+Purpose:
+Used for sending build notifications from Jenkins.
+
+---
+
+##  5. Kubernetes Credentials
+
+Kind: Secret File  
+ID:
+```
+k8s-cred
+```
+File:
+```
+kubeconfig.txt
+```
+Purpose:
+Allows Jenkins to authenticate and communicate with Kubernetes cluster using kubectl.
+
+---
+
+# 1️6 Jenkins Pipeline Job
+
+Created Pipeline Job:
+
+Name:
+```
+BoardGame
+```
+Pipeline
+
+i added pipeline code in this repo file name is  "Jenkins_Pieline_File"
+
+```
+
+This file contains all CI/CD stages:
+• Checkout  
+• Build  
+• Code Analysis  
+• Docker Build  
+• Security Scan  
+• Push Image  
+• Kubernetes Deployment  
+
+---
+
+# 1️7 Kubernetes Configuration Files
+
+Created a folder inside repository:
+```
+k8s/
+```
+Inside k8s folder created following files:
+
+---
+
+##  1. namespace.yaml
+
+Creates a dedicated namespace for the application.
+
+```bash
+nano namespace.yaml
+```
+Purpose:
+Logical isolation of resources inside Kubernetes cluster.
+
+---
+
+##  2. 1_Service_Account.yaml
+
+```bash
+nano 1_Service_Account.yaml
+```
+Purpose:
+Creates Service Account used by Jenkins to interact with cluster.
+
+---
+
+##  3. 2_role.yaml
+
+```bash
+nano 2_role.yaml
+```
+Purpose:
+Defines RBAC permissions (what actions are allowed).
+
+---
+
+##  4. 3_bind_role_to_service_acc.yaml
+
+```bash
+nano 3_bind_role_to_service_acc.yaml
+```
+Purpose:
+Binds Role to Service Account so Jenkins gets required permissions.
+
+---
+
+# 1️8 kubeconfig File Usage
+
+Generated kubeconfig file from Kubernetes cluster and saved as:
+
+```
+kubeconfig.txt
+```
+Uploaded in Jenkins as:
+Credential ID:
+```
+k8s-cred
+```
+
+---
+
+##  Why kubeconfig File is Required?
+
+kubeconfig file contains:
+
+• Cluster API Server endpoint  
+• Cluster certificate  
+• User authentication token  
+• Context information  
+
+Without kubeconfig:
+Jenkins cannot connect to Kubernetes cluster.
+Pipeline uses this credential like:
+
+```groovy
+withCredentials([file(credentialsId: 'k8s-cred', variable: 'KUBECONFIG')]) {
+    sh 'kubectl apply -f k8s/'
+}
+```
+
+This allows secure deployment from Jenkins to Kubernetes.
+
+
+# 19 Jenkins Email Notification Setup (Gmail SMTP)
+
+---
+
+##  Step 1 – Generate Gmail App Password
+
+Opened:
+
+https://myaccount.google.com/apppasswords
+
+Steps:
+
+1. Login with Gmail account  
+2. Go to **Security**
+3. Enable **2-Step Verification**
+4. Go to **App Passwords**
+5. Select:
+   - App → Mail
+   - Device → Other (Jenkins)
+6. Click **Generate**
+7. Copy the 16-digit App Password
+
+Note:
+We use App Password instead of normal Gmail password for security reasons.
+
+---
+
+##  Step 2 – Add Email Credential in Jenkins
+
+Go to:
+Manage Jenkins → Credentials → System → Global → Add Credentials
+Kind:
+```
+Username with password
+```
+ID:
+```
+mail-cred
+```
+Username:
+```
+samarthfunde45@gmail.com
+```
+Password:
+```
+<Generated App Password>
+```
+Click Save.
+
+---
+
+##  Step 3 – Configure SMTP in Jenkins
+
+Go to:
+Manage Jenkins → Configure System
+
+---
+
+### 1. Configure "Extended E-mail Notification"
+
+SMTP Server:
+```
+smtp.gmail.com
+```
+SMTP Port:
+```
+465
+```
+
+---
+
+###  2. Configure "E-mail Notification"
+
+SMTP Server:
+```
+smtp.gmail.com
+```
+
+Click Advanced and configure:
+
+Use SMTP Authentication → Enabled  
+Username:
+```
+samarthfunde45@gmail.com
+```
+Password:
+```
+<App Password>
+```
+Use SSL → Enabled  
+SMTP Port:
+```
+465
+```
+
+Click **Test Configuration** to verify.
+
+Then click **Save**.
+
+---
+
+# Why Email Notification is Required?
+
+Email notification helps to:
+
+• Notify build success or failure  
+• Alert team if deployment fails  
+• Send security scan results  
+• Improve monitoring and communication  
+
+<img width="1914" height="901" alt="image" src="https://github.com/user-attachments/assets/4591ed21-d193-490b-83fc-812ed4d2ad21" />
+
+
+---
