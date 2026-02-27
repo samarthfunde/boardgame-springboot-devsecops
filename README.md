@@ -80,6 +80,10 @@ I launched 6 EC2 instances in AWS to build a complete DevOps pipeline environmen
 | Nexus       | Artifact repository (Stores JAR/Docker images)             |
 | Monitor     | Monitoring server (Prometheus, Grafana, Blackbox Exporter) |
 
+
+<img width="1916" height="568" alt="image" src="https://github.com/user-attachments/assets/b330ecc9-0161-4bd0-a119-7d7b740e8d44" />
+
+
 ---
 
 ## 2️ Security Group Configuration
