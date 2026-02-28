@@ -50,7 +50,7 @@ This web application displays lists of board games and their reviews. While anyo
 4. To use initial user data, use the following credentials.
   - username: bugs    |     password: bunny (user role)
   - username: daffy   |     password: duck  (manager role)
-5. You can also sign-up as a new user and customize your role to play with the application! 😊
+5. You can also sign-up as a new user and customize your role to play with the application! 
 
 
 
@@ -1220,6 +1220,142 @@ Blackbox Exporter
 Prometheus  
 ↓  
 Grafana Dashboard  
+
+
+# ===============================
+#  Common Errors Faced During Project & How I Resolved Them
+# ===============================
+
+During this End-to-End DevSecOps project, I faced several real-time issues.
+Below are major issues and how I resolved them.
+
+---
+
+# 1 CrashLoopBackOff Error (Kubernetes)
+
+##  Issue:
+After deployment, pod was not running and showing:
+
+```
+CrashLoopBackOff
+```
+
+##  Troubleshooting Steps Used:
+
+```bash
+kubectl get pods -n <namespace>
+kubectl get nodes -n <namespace>
+kubectl logs <pod-name> -n <namespace>
+kubectl describe pod <pod-name> -n <namespace>
+```
+
+##  Root Causes I Found:
+
+• Wrong container port in deployment.yaml  
+• Application failed due to DB connection issue  
+• Missing environment variables  
+• Incorrect image version  
+
+##  Solution:
+
+• Corrected containerPort in YAML  
+• Fixed application.properties  
+• Rebuilt Docker image  
+• Redeployed to Kubernetes  
+
+After fix:
+```
+kubectl get pods -n <namespace>
+```
+Status changed to:
+```
+Running
+```
+
+---
+
+# 2  ImagePullBackOff Error
+
+##  Issue:
+Kubernetes failed to pull image.
+
+##  Reason:
+• Wrong Docker image name  
+• Image not pushed to DockerHub  
+• Docker credentials not configured  
+
+## Solution:
+
+• Verified image exists in DockerHub  
+• Checked docker login in Jenkins pipeline  
+• Re-pushed image  
+• Updated deployment.yaml  
+
+---
+
+
+
+#  3 SonarQube Authentication Failed
+
+##  Issue:
+Sonar stage failed due to authentication error.
+
+##  Reason:
+Wrong token configured in Jenkins.
+
+##  Solution:
+
+• Generated new token from SonarQube  
+• Updated Jenkins credential (sonar-token)  
+• Re-ran pipeline  
+
+---
+
+# 4 Kubernetes Connection Failed from Jenkins
+
+##  Issue:
+Pipeline failed during deployment stage.
+
+Error:
+```
+Unable to connect to the server
+```
+
+##  Reason:
+• kubeconfig not properly uploaded  
+• Wrong cluster endpoint  
+• Missing RBAC permissions  
+
+## Solution:
+
+• Regenerated kubeconfig file  
+• Uploaded as Secret File (k8s-cred)  
+• Verified RBAC role & rolebinding  
+• Tested manually:
+
+```bash
+kubectl get pods -n <namespace>
+```
+
+Then pipeline worked.
+
+---
+
+#  Prometheus Not Showing Targets
+
+##  Issue:
+Targets showing DOWN.
+
+##  Reason:
+Wrong target IP or port in prometheus.yml.
+
+##  Solution:
+
+• Edited prometheus.yml  
+• Corrected target IP  
+• Restarted Prometheus  
+
+---
 
 <img width="1918" height="916" alt="Screenshot 2026-02-27 110705" src="https://github.com/user-attachments/assets/67fb6bbb-11b7-46a7-ba80-2fe10e39a799" />
 
