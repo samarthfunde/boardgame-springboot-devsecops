@@ -7,7 +7,7 @@ This web application displays lists of board games and their reviews. While anyo
 
 ## Architecture
 
-<img width="749" height="671" alt="image" src="https://github.com/user-attachments/assets/d7229ace-9ef0-4d82-b566-9feca194c61a" />
+<img width="849" height="751" alt="Maven Project drawio" src="https://github.com/user-attachments/assets/73414ecf-b888-4f2b-822f-05d09199c365" />
 
 
 ## Technologies
