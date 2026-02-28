@@ -1222,9 +1222,9 @@ Prometheus
 Grafana Dashboard  
 
 
-# ===============================
+
 #  Common Errors Faced During Project & How I Resolved Them
-# ===============================
+
 
 During this End-to-End DevSecOps project, I faced several real-time issues.
 Below are major issues and how I resolved them.
